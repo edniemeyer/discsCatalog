@@ -5,8 +5,23 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var mongoose = require('mongoose');
+
+//MongoDB connection
+mongoose.connect('mongodb://localhost/catalog', function(err,db){
+    if (!err){
+        console.log('Connected to /catalog!');
+    } else{
+        console.dir(err); //failed to connect
+    }
+});
+
+
+require('./models/Discs');
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
+
 
 var app = express();
 
