@@ -15,7 +15,12 @@ app.config([
             .state('discs', {
                 url: '/discs',
                 templateUrl: 'partials/discs.html',
-                controller: 'MainCtrl'
+                controller: 'MainCtrl',
+                resolve: {
+                    discPromise: ['discs', function(discs) {
+                        return discs.getAll();
+                    }]
+                }
             })
             .state('create', {
                 url: '/create',
@@ -66,7 +71,6 @@ app.controller('DiscsCtrl', [
 app.controller('MainCtrl', [
     '$scope', 'discs', 'toastr',
     function($scope, discs, toastr) {
-        $scope.test = 'Hello world!';
 
         $scope.discs = discs.discs;
 
@@ -98,13 +102,13 @@ app.controller('MainCtrl', [
 
         $scope.addSong = function() {
             if (!$scope.song || $scope.song === '') { return; }
-            
+
             toastr.clear();
-            
+
             $scope.songs.push($scope.song)
-            
+
             $scope.song = '';
-            
+
             toastr.success('Song added!');
         };
 

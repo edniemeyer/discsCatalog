@@ -7,7 +7,7 @@
     <strong>Done!</strong> {{successTextAlert}}
 </div>
 
-<form ng-submit="addDisc()" style="margin-top:30px;">
+<form ng-submit="addDisc();" style="margin-top:30px;">
     <div class="form-group">
         <input type="text" class="form-control" placeholder="Band" ng-model="band"></input>
     </div>
@@ -35,7 +35,8 @@
             </span>
     </div>
 
-
-
-    <button type="submit" class="btn btn-primary">Add Disc</button>
+    <br>
+    <div>
+        <button type="submit" class="btn btn-primary pull-right">Add Disc</button>
+    </div>
 </form>
