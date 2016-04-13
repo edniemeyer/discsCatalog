@@ -1,6 +1,29 @@
 <div class="page-header">
-     <h1>Discs Catalog</h1>
+    <h1>Discs Catalog</h1>
+</div>
+<div>
+    <h2>Options:</h2>
 </div>
 <div class="container">
-    {{test}}
+    <a href="#/discs" title="All Discs" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span></a>
+    <a href="#/create" title="Add new Disc" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+</div>
+<div>
+    <h2>Or search for discs:</h2>
+</div>
+<form ng-submit="search()" style="margin-top:30px;">
+    <div class="input-group" id="adv-search">
+        <input ng-model="query" type="text" class="form-control" placeholder="Search for discs (by band name or disc title)" />
+        <div class="input-group-btn">
+            <div class="btn-group" role="group">
+                <button ng-click="search()" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <span style="font-size:20px; margin-left:10px;">
+              {{results}}
+    </span>
 </div>

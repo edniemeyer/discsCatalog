@@ -1,0 +1,41 @@
+<div class="page-header">
+    <h1>Add a new Disc</h1>
+</div>
+
+<div class="alert alert-success" ng-show="showSuccessAlert">
+    <button type="button" class="close" data-ng-click="switchBool('showSuccessAlert')">×</button>
+    <strong>Done!</strong> {{successTextAlert}}
+</div>
+
+<form ng-submit="addDisc()" style="margin-top:30px;">
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Band" ng-model="band"></input>
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Title" ng-model="title"></input>
+    </div>
+
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Description" ng-model="description"></input>
+    </div>
+
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Add a Song" ng-model="song"></input>
+        <div class="input-group-btn">
+            <div class="btn-group" role="group">
+                <button ng-click="addSong();" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <div ng-show="showSongs" ng-repeat="song in songs">
+        <span style="font-size:20px; margin-left:10px;">
+              {{song}}
+            </span>
+    </div>
+
+
+
+    <button type="submit" class="btn btn-primary">Add Disc</button>
+</form>

@@ -1,0 +1,14 @@
+<div class="page-header">
+    <h1>All Discs</h1>
+</div>
+
+<div ng-repeat="disc in discs">
+    <span style="font-size:20px; margin-left:10px;">
+              {{disc.band}}
+            </span>
+    <span style="font-size:20px; margin-left:10px;">
+            <a href="#/discs/{{disc._id}}">
+              {{disc.title}}
+             </a>
+            </span>
+</div>

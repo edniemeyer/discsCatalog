@@ -7,7 +7,7 @@ var mongoose     = require('mongoose'),
 
 
 var DiscSchema = new Schema({
-  band: String,
+  band: { type:String, es_indexed:true },
   title: { type:String, es_indexed:true },
   songs: [String],
   description: String
