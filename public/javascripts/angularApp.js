@@ -26,14 +26,31 @@ app.config([
                 url: '/create',
                 templateUrl: 'partials/create.html',
                 controller: 'MainCtrl'
+            })
+            .state('edit', {
+                url: '/discs/{id}',
+                templateUrl: 'partials/edit.html',
+                controller: 'DiscsCtrl',
+                resolve: {
+                    disc: ['$stateParams', 'discs', function($stateParams, discs) {
+                        return discs.get($stateParams.id);
+                    }]
+                }
             });
 
         $urlRouterProvider.otherwise('/home');
     }]);
 
+// services
 app.factory('discs', ['$http', function($http) {
     var o = {
         discs: []
+    };
+
+    o.get = function(id) {
+        return $http.get('/discs/' + id).then(function(res) {
+            return res.data;
+        });
     };
 
     o.getAll = function() {
@@ -44,6 +61,12 @@ app.factory('discs', ['$http', function($http) {
 
     o.create = function(disc) {
         return $http.post('/discs', disc).success(function(data) {
+            o.discs.push(data);
+        });
+    };
+
+    o.edit = function(id, disc) {
+        return $http.put('/discs/' + id, disc).success(function(data) {
             o.discs.push(data);
         });
     };
@@ -61,9 +84,52 @@ app.controller('DiscsCtrl', [
     '$scope',
     'discs',
     'disc',
-    function($scope, discs, disc) {
+    'toastr',
+    function($scope, discs, disc, toastr) {
 
         $scope.disc = disc;
+
+        $scope.showSuccessAlert = false;
+
+        $scope.title = disc.title;
+        $scope.band = disc.band;
+        $scope.description = disc.description;
+        $scope.songs = disc.songs;
+
+        $scope.editDisc = function() {
+            if (!$scope.title || $scope.title === '') { toastr.warning('You should add a title!'); return; }
+            if (!$scope.band || $scope.band === '') { toastr.warning('You should add a band!'); return; }
+            discs.edit(disc._id, {
+                band: $scope.band,
+                title: $scope.title,
+                songs: $scope.songs,
+                description: $scope.description,
+            }).success(function() {
+                $scope.successTextAlert = "Disc edited!";
+                $scope.showSuccessAlert = true;
+                $scope.title = '';
+                $scope.band = '';
+                $scope.description = '';
+                $scope.songs = [];
+            });
+        };
+
+        // switch flag
+        $scope.switchBool = function(value) {
+            $scope[value] = !$scope[value];
+        };
+
+        $scope.addSong = function() {
+            if (!$scope.song || $scope.song === '') { return; }
+
+            toastr.clear();
+
+            $scope.songs.push($scope.song)
+
+            $scope.song = '';
+
+            toastr.success('Song added!');
+        };
 
     }]);
 
@@ -88,11 +154,11 @@ app.controller('MainCtrl', [
                 description: $scope.description,
             }).success(function() {
                 $scope.showSuccessAlert = true;
+                $scope.title = '';
+                $scope.band = '';
+                $scope.description = '';
+                $scope.songs = [];
             });
-            $scope.title = '';
-            $scope.band = '';
-            $scope.description = '';
-            $scope.songs = [];
         };
 
         // switch flag
@@ -111,6 +177,8 @@ app.controller('MainCtrl', [
 
             toastr.success('Song added!');
         };
+
+
 
         $scope.search = function() {
             if (!$scope.query || $scope.query === '') { return; }
