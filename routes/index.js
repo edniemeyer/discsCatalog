@@ -59,12 +59,12 @@ router.put('/discs/:disc', function(req, res, next) {
     });
 });
 
-router.delete('/discs/:disc', function(req, res) {
+router.delete('/discs/:disc', function(req, res, next) {
     Disc.remove({
-        _id: req.params._id
+        _id: req.disc._id
     }, function(err, disc) {
-        if (err) return res.send(err);
-        res.json({ message: 'Disc deleted' });
+        if (err) return next(err);
+        res.json(disc);
     });
 });
 

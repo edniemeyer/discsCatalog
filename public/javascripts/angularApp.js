@@ -71,6 +71,10 @@ app.factory('discs', ['$http', function($http) {
         });
     };
 
+    o.delete = function(id) {
+        return $http.delete('/discs/' + id);
+    };
+
     o.search = function(query) {
         return $http.post('/search', query).success(function(res) {
             return res.data;
@@ -177,6 +181,28 @@ app.controller('MainCtrl', [
 
             toastr.success('Song added!');
         };
+
+        $scope.deleteDisc = function(disc) {
+            discs.delete(disc._id).success(function() {
+                $scope.removeRow(disc._id);
+                toastr.error("Disc deleted!");
+            });
+        };
+        
+        $scope.removeRow = function(id){				
+		var index = -1;		
+		var comArr = eval( $scope.discs );
+		for( var i = 0; i < comArr.length; i++ ) {
+			if( comArr[i]._id === id ) {
+				index = i;
+				break;
+			}
+		}
+		if( index === -1 ) {
+			alert( "Something gone wrong" );
+		}
+		$scope.discs.splice( index, 1 );		
+	};
 
 
 
