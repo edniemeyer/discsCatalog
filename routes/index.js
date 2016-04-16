@@ -74,9 +74,10 @@ router.delete('/discs/:disc', function (req, res, next) {
         disc.remove(function (err) {
             if (err) throw err;
             /* Document unindexing in the background */
-            disc.on('es-removed', function (err, res) {
+            disc.on('es-removed', function (err, res2) {
                 if (err) throw err;
                 /* Docuemnt is unindexed */
+                res.json(disc);
             });
         });
     });

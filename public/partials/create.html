@@ -26,13 +26,10 @@
             <div class="btn-group" role="group">
                 <button ng-click="addSong();" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
             </div>
+            <div class="btn-group" role="group">
+                <button ng-click="showSongs = !(showSongs)" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-list" aria-hidden="true"></span></button>
+            </div>
         </div>
-    </div>
-
-    <div ng-show="showSongs" ng-repeat="song in songs">
-        <span style="font-size:20px; margin-left:10px;">
-              {{song}}
-            </span>
     </div>
 
     <br>
@@ -40,3 +37,21 @@
         <button type="submit" class="btn btn-primary pull-right">Add Disc</button>
     </div>
 </form>
+
+<table id="songs" ng-show="showSongs" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Song</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="song in songs track by $index">
+            <td style="font-size:20px; margin-left:10px;">
+                {{song}}
+            </td>
+            <td> 
+                <a href ng-click="deleteSong(song);" class="glyphicon glyphicon-remove"></a>
+            </td>
+        </tr>
+    </tbody>
+</table>

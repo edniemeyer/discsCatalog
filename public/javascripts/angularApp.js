@@ -95,6 +95,7 @@ app.controller('DiscsCtrl', [
 
         $scope.showSuccessAlert = false;
 
+        //setting the data from mongodb to the page
         $scope.title = disc.title;
         $scope.band = disc.band;
         $scope.description = disc.description;
@@ -133,6 +134,30 @@ app.controller('DiscsCtrl', [
             $scope.song = '';
 
             toastr.success('Song added!');
+        };
+        
+        $scope.showSongs = false;
+        
+        $scope.deleteSong = function (song) {
+            // there is a bug here, bcus song is just text, so if there are repeated text on the $scope.songs it will delete the first that appears on the array
+            $scope.removeRow(song, $scope.songs)
+            toastr.error("Song removed!");
+        };
+
+        $scope.removeRow = function (object, array) {
+            var index = -1;
+            var comArr = eval(array);
+            for (var i = 0; i < comArr.length; i++) {
+                if (JSON.stringify(comArr[i]) === JSON.stringify(object)) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index === -1) {
+                alert("Something gone wrong");
+            }
+            else
+                array.splice(index, 1);
         };
 
     }]);
@@ -184,16 +209,21 @@ app.controller('MainCtrl', [
 
         $scope.deleteDisc = function (disc) {
             discs.delete(disc._id).success(function () {
-                $scope.removeRow(disc._id);
+                $scope.removeRow(disc, $scope.discs);
                 toastr.error("Disc deleted!");
             });
         };
 
-        $scope.removeRow = function (id) {
+        $scope.deleteSong = function (song) {
+            $scope.removeRow(song, $scope.songs)
+            toastr.error("Song removed!");
+        };
+
+        $scope.removeRow = function (object, array) {
             var index = -1;
-            var comArr = eval($scope.discs);
+            var comArr = eval(array);
             for (var i = 0; i < comArr.length; i++) {
-                if (comArr[i]._id === id) {
+                if (JSON.stringify(comArr[i]) === JSON.stringify(object)) {
                     index = i;
                     break;
                 }
@@ -201,7 +231,8 @@ app.controller('MainCtrl', [
             if (index === -1) {
                 alert("Something gone wrong");
             }
-            $scope.discs.splice(index, 1);
+            else
+                array.splice(index, 1);
         };
 
 
@@ -215,11 +246,11 @@ app.controller('MainCtrl', [
                         $scope.showResults = true;
                         $scope.results = results.hits.hits;
                     }
-                    else{
+                    else {
                         $scope.showResults = false;
                         toastr.info('No discs found for this query! Try again!')
                     }
-                    
+
                     $scope.query = '';
 
                 });
