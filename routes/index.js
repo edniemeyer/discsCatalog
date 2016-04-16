@@ -5,32 +5,35 @@ var mongoose = require('mongoose');
 var Disc = mongoose.model('Disc');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
     res.render('index', { title: 'Discs Catalog' });
 });
 
-router.get('/discs', function(req, res, next) {
-    Disc.find(function(err, discs) {
+router.get('/discs', function (req, res, next) {
+    Disc.find(function (err, discs) {
         if (err) { return next(err); }
 
         res.json(discs);
     });
 });
 
-router.post('/discs', function(req, res, next) {
+router.post('/discs', function (req, res, next) {
     var disc = new Disc(req.body);
 
-    disc.save(function(err, disc) {
+    disc.save(function (err, disc) {
         if (err) { return next(err); }
-
-        res.json(disc);
+        disc.on('es-indexed', function (err, res2) {
+            if (err) throw err;
+            /* Document is indexed */
+            res.json(disc);
+        });
     });
 });
 
-router.param('disc', function(req, res, next, id) {
+router.param('disc', function (req, res, next, id) {
     var query = Disc.findById(id);
 
-    query.exec(function(err, disc) {
+    query.exec(function (err, disc) {
         if (err) { return next(err); }
         if (!disc) { return next(new Error('can\'t find disc')); }
 
@@ -39,12 +42,12 @@ router.param('disc', function(req, res, next, id) {
     });
 });
 
-router.get('/discs/:disc', function(req, res) {
+router.get('/discs/:disc', function (req, res) {
     res.json(req.disc);
 });
 
-router.put('/discs/:disc', function(req, res, next) {
-    Disc.findById(req.disc._id, function(err, disc) {
+router.put('/discs/:disc', function (req, res, next) {
+    Disc.findById(req.disc._id, function (err, disc) {
         if (err) { return next(err); };
 
         if (req.body.band) disc.band = req.body.band;
@@ -52,29 +55,48 @@ router.put('/discs/:disc', function(req, res, next) {
         if (req.body.description) disc.description = req.body.description;
         if (req.body.songs) disc.songs = req.body.songs;
 
-        disc.save(function(err) {
+        disc.save(function (err) {
             if (err) { return next(err); };
-            res.json(disc);
+            disc.on('es-indexed', function (err, res2) {
+                if (err) throw err;
+                /* Document is indexed */
+                res.json(disc);
+            });
         });
     });
 });
 
-router.delete('/discs/:disc', function(req, res, next) {
-    Disc.remove({
-        _id: req.disc._id
-    }, function(err, disc) {
-        if (err) return next(err);
-        res.json(disc);
+router.delete('/discs/:disc', function (req, res, next) {
+
+    //Can't use Disc.remove() because it is a direct connection to MongoDB, not passing through mongoose, so not unindexing from elasticsearch 
+    Disc.findById(req.disc._id, function (err, disc) {
+        if (err) throw err;
+        disc.remove(function (err) {
+            if (err) throw err;
+            /* Document unindexing in the background */
+            disc.on('es-removed', function (err, res) {
+                if (err) throw err;
+                /* Docuemnt is unindexed */
+            });
+        });
     });
 });
 
-router.post('/search', function(req, res, next) {
+/*Disc.remove({
+    _id: req.disc._id
+}, function (err, disc) {
+    if (err) return next(err);
+    res.json(disc);
+});
+});*/
+
+router.post('/search', function (req, res, next) {
 
     Disc.search(
         {
             query_string:
-            { query: req.body }
-        }, function(err, results) {
+            { query: req.body.query }
+        }, function (err, results) {
             if (err) return next(err);
             if (!results) return next(new Error('No discs found'));
             res.json(results);

@@ -4,7 +4,7 @@ var app = angular.module('discsCatalog', ['ui.router', 'ngAnimate', 'toastr']);
 app.config([
     '$stateProvider',
     '$urlRouterProvider',
-    function($stateProvider, $urlRouterProvider) {
+    function ($stateProvider, $urlRouterProvider) {
 
         $stateProvider
             .state('home', {
@@ -17,7 +17,7 @@ app.config([
                 templateUrl: 'partials/discs.html',
                 controller: 'MainCtrl',
                 resolve: {
-                    discPromise: ['discs', function(discs) {
+                    discPromise: ['discs', function (discs) {
                         return discs.getAll();
                     }]
                 }
@@ -32,7 +32,7 @@ app.config([
                 templateUrl: 'partials/edit.html',
                 controller: 'DiscsCtrl',
                 resolve: {
-                    disc: ['$stateParams', 'discs', function($stateParams, discs) {
+                    disc: ['$stateParams', 'discs', function ($stateParams, discs) {
                         return discs.get($stateParams.id);
                     }]
                 }
@@ -42,42 +42,42 @@ app.config([
     }]);
 
 // services
-app.factory('discs', ['$http', function($http) {
+app.factory('discs', ['$http', function ($http) {
     var o = {
         discs: []
     };
 
-    o.get = function(id) {
-        return $http.get('/discs/' + id).then(function(res) {
+    o.get = function (id) {
+        return $http.get('/discs/' + id).then(function (res) {
             return res.data;
         });
     };
 
-    o.getAll = function() {
-        return $http.get('/discs').success(function(data) {
+    o.getAll = function () {
+        return $http.get('/discs').success(function (data) {
             angular.copy(data, o.discs);
         });
     };
 
-    o.create = function(disc) {
-        return $http.post('/discs', disc).success(function(data) {
+    o.create = function (disc) {
+        return $http.post('/discs', disc).success(function (data) {
             o.discs.push(data);
         });
     };
 
-    o.edit = function(id, disc) {
-        return $http.put('/discs/' + id, disc).success(function(data) {
+    o.edit = function (id, disc) {
+        return $http.put('/discs/' + id, disc).success(function (data) {
             o.discs.push(data);
         });
     };
 
-    o.delete = function(id) {
+    o.delete = function (id) {
         return $http.delete('/discs/' + id);
     };
 
-    o.search = function(query) {
-        return $http.post('/search', query).success(function(res) {
-            return res.data;
+    o.search = function (query) {
+        return $http.post('/search', query).success(function (res) {
+            return res.hits;
         });
     };
 
@@ -89,7 +89,7 @@ app.controller('DiscsCtrl', [
     'discs',
     'disc',
     'toastr',
-    function($scope, discs, disc, toastr) {
+    function ($scope, discs, disc, toastr) {
 
         $scope.disc = disc;
 
@@ -100,7 +100,7 @@ app.controller('DiscsCtrl', [
         $scope.description = disc.description;
         $scope.songs = disc.songs;
 
-        $scope.editDisc = function() {
+        $scope.editDisc = function () {
             if (!$scope.title || $scope.title === '') { toastr.warning('You should add a title!'); return; }
             if (!$scope.band || $scope.band === '') { toastr.warning('You should add a band!'); return; }
             discs.edit(disc._id, {
@@ -108,7 +108,7 @@ app.controller('DiscsCtrl', [
                 title: $scope.title,
                 songs: $scope.songs,
                 description: $scope.description,
-            }).success(function() {
+            }).success(function () {
                 $scope.successTextAlert = "Disc edited!";
                 $scope.showSuccessAlert = true;
                 $scope.title = '';
@@ -119,11 +119,11 @@ app.controller('DiscsCtrl', [
         };
 
         // switch flag
-        $scope.switchBool = function(value) {
+        $scope.switchBool = function (value) {
             $scope[value] = !$scope[value];
         };
 
-        $scope.addSong = function() {
+        $scope.addSong = function () {
             if (!$scope.song || $scope.song === '') { return; }
 
             toastr.clear();
@@ -140,7 +140,7 @@ app.controller('DiscsCtrl', [
 
 app.controller('MainCtrl', [
     '$scope', 'discs', 'toastr',
-    function($scope, discs, toastr) {
+    function ($scope, discs, toastr) {
 
         $scope.discs = discs.discs;
 
@@ -148,7 +148,7 @@ app.controller('MainCtrl', [
         $scope.successTextAlert = "Disc added!";
         $scope.showSongs = false;
 
-        $scope.addDisc = function() {
+        $scope.addDisc = function () {
             if (!$scope.title || $scope.title === '') { toastr.warning('You should add a title!'); return; }
             if (!$scope.band || $scope.band === '') { toastr.warning('You should add a band!'); return; }
             discs.create({
@@ -156,7 +156,7 @@ app.controller('MainCtrl', [
                 title: $scope.title,
                 songs: $scope.songs,
                 description: $scope.description,
-            }).success(function() {
+            }).success(function () {
                 $scope.showSuccessAlert = true;
                 $scope.title = '';
                 $scope.band = '';
@@ -166,11 +166,11 @@ app.controller('MainCtrl', [
         };
 
         // switch flag
-        $scope.switchBool = function(value) {
+        $scope.switchBool = function (value) {
             $scope[value] = !$scope[value];
         };
 
-        $scope.addSong = function() {
+        $scope.addSong = function () {
             if (!$scope.song || $scope.song === '') { return; }
 
             toastr.clear();
@@ -182,37 +182,46 @@ app.controller('MainCtrl', [
             toastr.success('Song added!');
         };
 
-        $scope.deleteDisc = function(disc) {
-            discs.delete(disc._id).success(function() {
+        $scope.deleteDisc = function (disc) {
+            discs.delete(disc._id).success(function () {
                 $scope.removeRow(disc._id);
                 toastr.error("Disc deleted!");
             });
         };
-        
-        $scope.removeRow = function(id){				
-		var index = -1;		
-		var comArr = eval( $scope.discs );
-		for( var i = 0; i < comArr.length; i++ ) {
-			if( comArr[i]._id === id ) {
-				index = i;
-				break;
-			}
-		}
-		if( index === -1 ) {
-			alert( "Something gone wrong" );
-		}
-		$scope.discs.splice( index, 1 );		
-	};
+
+        $scope.removeRow = function (id) {
+            var index = -1;
+            var comArr = eval($scope.discs);
+            for (var i = 0; i < comArr.length; i++) {
+                if (comArr[i]._id === id) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index === -1) {
+                alert("Something gone wrong");
+            }
+            $scope.discs.splice(index, 1);
+        };
 
 
+        $scope.showResults = false;
 
-        $scope.search = function() {
+        $scope.search = function () {
             if (!$scope.query || $scope.query === '') { return; }
-            discs.search($scope.query)
-                .success(function(results) {
-                    $scope.results.push(results);
+            discs.search({ query: $scope.query })
+                .success(function (results) {
+                    if (results.hits.hits.length > 0) {
+                        $scope.showResults = true;
+                        $scope.results = results.hits.hits;
+                    }
+                    else
+                        toastr.info('No discs found for this query! Try again!')
+                    
+                    $scope.query = '';
+
                 });
-            $scope.query = '';
+
         };
 
 
