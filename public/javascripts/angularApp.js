@@ -215,8 +215,10 @@ app.controller('MainCtrl', [
                         $scope.showResults = true;
                         $scope.results = results.hits.hits;
                     }
-                    else
+                    else{
+                        $scope.showResults = false;
                         toastr.info('No discs found for this query! Try again!')
+                    }
                     
                     $scope.query = '';
 
